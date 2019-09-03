@@ -29,12 +29,10 @@ type plugin struct {
 //noinspection GoUnusedGlobalVariable
 var KustomizePlugin plugin
 
-func (p *plugin) Generate() (resmap.ResMap, error) { return nil, nil }
-
-func (p *plugin) Config(ldr ifc.Loader, rf *resmap.Factory, c []byte) (err error) {
+func (p *plugin) Config(ldr ifc.Loader, rf *resmap.Factory, config []byte) error {
 	p.ldr = ldr
 	p.rf = rf
-	err = yaml.Unmarshal(c, p)
+	err := yaml.Unmarshal(config, p)
 	if err != nil {
 		return err
 	}

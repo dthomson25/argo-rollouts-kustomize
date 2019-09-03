@@ -1,4 +1,4 @@
-module github.com/dthomson25/argo-rollouts-kustomze
+module github.com/dthomson25/argo-rollouts-kustomize
 
 go 1.12
 

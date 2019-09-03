@@ -26,42 +26,13 @@ spec:
       containers:
       - name: nginx
         image: nginx
-`
-	targetWithNamespace = `
-apiVersion: apps/v1
-metadata:
-  name: myDeploy
-  namespace: namespace1
-kind: Deployment
-spec:
-  replica: 2
-  template:
-    metadata:
-      labels:
-        old-label: old-value
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
-`
-	targetNoschema = `
-apiVersion: argoproj.io/v1alpha1
-kind: Rollout
-metadata:
-  name: my-foo
-spec:
-  template:
-    metadata:
-      labels:
-        old-label: old-value
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
+        env:
+        - name: foo
+          value: bar
 `
 )
 
-func TestStrategicMergeTransformerNoSchema(t *testing.T) {
+func TestStrategicMergeTransformer(t *testing.T) {
 	tc := plugins_test.NewEnvForTest(t).Set()
 	defer tc.Reset()
 
@@ -84,8 +55,8 @@ spec:
       containers:
       - name: nginx
         env:
-        - name: why
-          value: so serious
+        - name: foo
+          value: baz
 `)
 	rm := th.LoadAndRunTransformer(`
 apiVersion: argoproj.io/v1alpha1
@@ -94,7 +65,11 @@ metadata:
   name: notImportantHere
 paths:
 - patch.yaml
-`, targetNoschema)
+`, target)
+
+metadata:
+  labels:
+    new-label: new-value
 
 	th.AssertActualEqualsExpected(rm, `
 apiVersion: argoproj.io/v1alpha1
@@ -110,8 +85,8 @@ spec:
     spec:
       containers:
       - env:
-        - name: why
-          value: so serious
+        - name: foo
+          value: baz
         image: nginx
         name: nginx
 `)
